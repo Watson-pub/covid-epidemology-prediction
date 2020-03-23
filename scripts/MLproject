@@ -1,0 +1,28 @@
+name: epidemic-model
+
+conda_env: conda.yaml
+
+entry_points:
+  load_disease_data:
+    parameters:
+      disease_data_path: path
+      total_population: {type: int, default: 51269185}
+    command: "python load_infection_data.py --disease-data-path {disease_data_path} --total-population {total_population}"
+
+
+  fit_sir_model:
+    parameters:
+      disease_data: DataFrame
+      contact_transmissions: {type: float, default: 0.2}
+      contact_rate: {type: float, default: 10.0}
+      recovery_rate: {type: float, default: 0.0714}
+      death_rate: {type: float, default: 0.05}
+      days_to_check: {type: int, default: 7}
+    command: "python sir_model.py --disease-data {disease_data} --contact-transmissions {contact_transmissions} --contact-rate {contact_rate} --recovery-rate {recovery_rate} --death-rate {death_rate} --days-to-check {days_to_check}"
+
+  run_sir_model:
+    parameters:
+      disease_data_path: path
+      days_to_check: {type: int, default: 7}
+    command: "python predict_sir_model.py --disease-data-path {disease_data_path} --days-to-check {days_to_check}"
+
