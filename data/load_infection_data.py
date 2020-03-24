@@ -1,4 +1,5 @@
 import os
+import shutil
 from pathlib import Path
 
 import click
@@ -9,10 +10,7 @@ import tempfile
 SOUTH_KOREA_POPULATION = 51269185
 
 
-@click.command()
-@click.option("--disease-data-path", type=Path)
-@click.option("--total-population", default=SOUTH_KOREA_POPULATION, type=int)
-def load_disease_data(disease_data_path, total_population):
+def load_disease_data(disease_data_path, total_population=SOUTH_KOREA_POPULATION):
     base_data = pd.read_csv(disease_data_path)
     base_data.index.name = "time"
     # current infected = total infected - recovered - dead
@@ -24,14 +22,21 @@ def load_disease_data(disease_data_path, total_population):
                      inplace=True)
 
     tmpdir = tempfile.mkdtemp()
-    data_dir = os.path.join(tmpdir, "disease data")
+    file_path = os.path.join(tmpdir, "infections.parquet")
     result = base_data[["Susceptible", "Infected", "Recovered", "Dead"]]
-    result.to_parquet(data_dir, index=True)
-    mlflow.log_artifacts(data_dir, "infections-data")
-    os.rmdir(tmpdir)
+    result.to_parquet(file_path, index=True)
+    mlflow.log_artifacts(tmpdir, "infections-data")
+    shutil.rmtree(tmpdir, ignore_errors=True)
 
     return result
 
 
+@click.command()
+@click.option("--disease-data-path", type=Path)
+@click.option("--total-population", default=SOUTH_KOREA_POPULATION, type=int)
+def load_disease_data_command(disease_data_path, total_population):
+    load_disease_data(disease_data_path, total_population)
+
+
 if __name__ == '__main__':
-    load_disease_data()
+    load_disease_data_command()

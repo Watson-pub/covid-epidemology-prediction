@@ -12,12 +12,13 @@ from models.sir_model import fit_sir_model
 @click.option("--days-to-check", default=7, type=int)
 def run_model(disease_data_path, days_to_check):
     with mlflow.start_run():
-        disease_data = load_disease_data(disease_data_path)
+        disease_data = load_disease_data(disease_data_path, 51269185)
         # contact_transmissions=42
         # contact_rate=42
         # recovery_rate=42
         # death_rate=42
         future_data = fit_sir_model(disease_data, days_to_check=days_to_check)
+        print(future_data.shape)
 
 
 if __name__ == "__main__":

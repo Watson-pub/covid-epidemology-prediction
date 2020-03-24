@@ -1,17 +1,9 @@
-import click
 import mlflow
 import pandas as pd
 
 
-@click.command()
-@click.option("--disease-data", type=pd.DataFrame)
-@click.option("--contact-transmissions", default=0.2, type=float)
-@click.option("--contact-rate", default=10.0, type=float)
-@click.option("--recovery-rate", default=1.0 / 14, type=float)
-@click.option("--death-rate", default=0.05, type=float)
-@click.option("--days-to-check", default=7, type=int)
-def fit_sir_model(disease_data, contact_transmissions: float, contact_rate: float, recovery_rate: float,
-                  death_rate: float, days_to_check: int):
+def fit_sir_model(disease_data, contact_transmissions=0.2, contact_rate=5.0, recovery_rate=1.0 / 14,
+                  death_rate=0.02, days_to_check=7):
     mlflow.log_param("contact_transmissions", contact_transmissions)
     mlflow.log_param("contact_rate", contact_rate)
     mlflow.log_param("recovery_rate", recovery_rate)
@@ -93,14 +85,14 @@ class SIRModel:
             R.append(round(recovered_t))
             D.append(round(dead_t))
 
-        mlflow.log_metric(f"Susceptible at t ({num_days} days)", S[-1])
-        mlflow.log_metric(f"Infected at t ({num_days} days)", I[-1])
-        mlflow.log_metric(f"Recovered at t ({num_days} days)", R[-1])
-        mlflow.log_metric(f"Dead at t ({num_days} days)", D[-1])
+        mlflow.log_metric(f"Susceptible at {num_days} days", S[-1])
+        mlflow.log_metric(f"Infected at {num_days} days", I[-1])
+        mlflow.log_metric(f"Recovered at {num_days} days", R[-1])
+        mlflow.log_metric(f"Dead at {num_days} days", D[-1])
 
-        return pd.DataFrame([[S[ind], I[ind], R[ind], D[ind]] for ind in range(num_days)],
+        return pd.DataFrame([[S[ind], I[ind], R[ind], D[ind]] for ind in range(num_days+1)],
                             columns=["Susceptible", "Infected", "Recovered", "Dead"],
-                            index=range(num_days))
+                            index=range(num_days+1))
 
 
 if __name__ == '__main__':
