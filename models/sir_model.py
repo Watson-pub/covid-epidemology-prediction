@@ -93,7 +93,3 @@ class SIRModel:
         return pd.DataFrame([[S[ind], I[ind], R[ind], D[ind]] for ind in range(num_days+1)],
                             columns=["Susceptible", "Infected", "Recovered", "Dead"],
                             index=range(num_days+1))
-
-
-if __name__ == '__main__':
-    fit_sir_model()
